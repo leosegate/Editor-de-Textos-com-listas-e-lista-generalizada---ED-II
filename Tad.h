@@ -1,5 +1,3 @@
-#include <stdio.h>
-
 typedef struct charS {
 	char letra;
 	struct charS *ant, *prox;
@@ -14,6 +12,16 @@ typedef struct linhas {
 typedef struct descritor {
 	Linhas *inicio;
 }DescLinhas;
+
+
+//para usar no final do pdf, entender direito isso
+typedef struct noPalavra {
+    char letra;
+    int final; //true or false
+    struct noPalavra *prim; // Ponteiro para baixo 
+    struct noPalavra *prox; // Ponteiro para a direita
+} NoPalavra;
+//-----------------------------------------------------------------
 
 void freeLetras(Linhas**L) {
 	Letra *letra, *aux;
@@ -30,7 +38,7 @@ void freeLetras(Linhas**L) {
 
 void freeLinha(Linhas**L) {
 	if(*L == NULL)
-		return;
+		return ;
 	
 	Linhas *ant = (*L)->top;
 	Linhas *prox = (*L)->botton;
@@ -72,7 +80,7 @@ Linhas* linhaEmBranco() {
 	Linhas *nova;
 	nova = (Linhas*)malloc(sizeof(Linhas));
 	
-	if (nova = NULL)
+	if (nova == NULL)
 		return NULL;
 	
 	nova->botton = NULL;
