@@ -27,4 +27,10 @@ typedef struct noPalavra {
     struct noPalavra *prox; // Ponteiro para a direita
 } NoPalavra;
 
+typedef struct cursor {
+    Linha *linha;
+    Letra *letra;
+    int col;
+}Cursor;
+
 #endif
