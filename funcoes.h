@@ -246,6 +246,117 @@ void inserirNaListaG(NoPalavra **raiz, char *palavra) {
     }
 }
 
+void removerChar(Cursor *c) {
+    if (c->letra == NULL) {
+        if (c->linha->top == NULL)
+            return;
+
+        Linha *linhaAtual = c->linha;
+        Linha *linhaCima = c->linha->top;
+
+        Letra *aux = linhaCima->inicioL;
+        Letra *ultima = NULL;
+
+        while (aux != NULL) {
+            ultima = aux;
+            aux = aux->prox;
+        }
+
+        if (ultima != NULL) {
+            ultima->prox = linhaAtual->inicioL;
+
+            if (linhaAtual->inicioL != NULL)
+                linhaAtual->inicioL->ant = ultima;
+        } else {
+            linhaCima->inicioL = linhaAtual->inicioL;
+        }
+
+        linhaCima->nro += linhaAtual->nro;
+        linhaCima->botton = linhaAtual->botton;
+
+        if (linhaAtual->botton != NULL)
+            linhaAtual->botton->top = linhaCima;
+
+        c->linha = linhaCima;
+        c->letra = ultima;
+        c->col = linhaCima->nro;
+
+        free(linhaAtual);
+    }
+    else {
+        Letra *remover = c->letra;
+
+        if (remover->ant != NULL) {
+            remover->ant->prox = remover->prox;
+        } else {
+            c->linha->inicioL = remover->prox;
+        }
+        if (remover->prox != NULL) {
+            remover->prox->ant = remover->ant;
+        }
+        c->letra = remover->ant;
+        c->col--;
+
+        c->linha->nro--;
+
+        free(remover);
+    }
+}
+
+void quebrarLinha(Cursor *c, DescLinhas *d) {
+    Linha *linhaAtual = c->linha;
+
+    Linha *nova = (Linha*) malloc(sizeof(Linha));
+    nova->inicioL = NULL;
+    nova->top = linhaAtual;
+    nova->botton = linhaAtual->botton;
+    nova->nro = 0;
+
+    if (linhaAtual->botton != NULL)
+        linhaAtual->botton->top = nova;
+
+    linhaAtual->botton = nova;
+
+    if (c->letra == NULL) {
+        nova->inicioL = linhaAtual->inicioL;
+        nova->nro = linhaAtual->nro;
+
+        linhaAtual->inicioL = NULL;
+        linhaAtual->nro = 0;
+    }
+
+    else {
+        Letra *quebra = c->letra->prox;
+
+        nova->inicioL = quebra;
+
+        int count = 0;
+        Letra *aux = quebra;
+
+        while (aux != NULL) {
+            aux->ant = NULL;
+            if (aux->prox == NULL) break;
+            aux = aux->prox;
+            count++;
+        }
+        if (quebra != NULL) count++; 
+
+        nova->nro = count;
+
+        c->letra->prox = NULL;
+        linhaAtual->nro -= nova->nro;
+
+        if (quebra != NULL)
+            quebra->ant = NULL;
+    }
+
+    d->qntdLinhas++;
+
+    c->linha = nova;
+    c->letra = NULL;
+    c->col = 0;
+}
+
 void moverEsquerda(Cursor *c) {
     if (c->letra != NULL) {
         c->letra = c->letra->ant;
@@ -254,15 +365,12 @@ void moverEsquerda(Cursor *c) {
 }
 
 void moverDireita(Cursor *c) {
-    // se cursor está antes do primeiro caractere
     if (c->letra == NULL) {
         if (c->linha->inicioL != NULL) {
             c->letra = c->linha->inicioL;
             c->col++;
         }
-    }
-    // se tem próximo
-    else if (c->letra->prox != NULL) {
+    } else if (c->letra->prox != NULL) {
         c->letra = c->letra->prox;
         c->col++;
     }
@@ -280,7 +388,7 @@ Letra* irParaColuna(Linha *linha, int col) {
         i++;
     }
 
-    return anterior; // retorna a letra à esquerda da coluna
+    return anterior;
 }
 
 void moverCima(Cursor *c) {

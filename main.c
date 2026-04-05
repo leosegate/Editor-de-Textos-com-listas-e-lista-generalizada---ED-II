@@ -141,10 +141,10 @@ int main() {
                     continuar = 0;
                 }
                 else if (tecla == 13) { // ENTER
-                    //quebrarLinha(&cursor, meuEditor);
+                    quebrarLinha(&cursor, meuEditor);
                 }
                 else if (tecla == 8) { // BACKSPACE
-                    //removerChar(&cursor);
+                    removerChar(&cursor);
                 }
                 else if (tecla >= 32 && tecla <= 255) {
                     inserirChar(&cursor, (char)tecla);
